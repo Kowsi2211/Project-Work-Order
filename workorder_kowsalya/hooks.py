@@ -291,5 +291,13 @@ fixtures = [
         ]
        
     ]},
+    {"dt":"UOM","filters": [
+        [ 
+            "name","in", [
+            "sq.ft","hrs","pcs"
+        ]
+        ]
+       
+    ]},
     
 ]
