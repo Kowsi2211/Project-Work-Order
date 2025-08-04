@@ -57,19 +57,54 @@ frappe.ui.form.on("Project Work Order", {
                         frm.save();
                         frm.remove_custom_button("Change Status")
                         d.hide();
-                        
+
                     },
                 });
                 d.show();
             });
         }
-        
+
 
 
         setTimeout(() => {
             // Hide all buttons or links that say "Edit"
             $("a.dropdown-item:contains('Edit'), button.dropdown-item:contains('Edit')").hide();
         }, 500);
+    },
+    onload(frm) {
+        if (frm.doc.client_name) {
+
+            frappe.call({
+                method: "workorder_kowsalya.workorder_kowsalya.doctype.project_work_order.project_work_order.fetch_address",
+                args: { client_name: frm.doc.client_name },
+                callback: function (r) {
+                    let [address, contact, email] = r.message;
+                    if (address) {
+                        frm.set_value("client_address", address);
+                        frm.set_df_property("client_address", "read_only", 1);
+                    } else {
+                        frm.set_value("client_address", " ");
+                        frm.set_df_property("client_address", "read_only", 0);
+                    }
+                    if (email) {
+                        frm.set_value("client_email", email);
+                        frm.set_df_property("client_email", "read_only", 1);
+                    } else {
+                        frm.set_value("client_email", " ");
+                        frm.set_df_property("client_email", "read_only", 0);
+                    }
+                    if (contact) {
+                        frm.set_value("client_phone", contact);
+                        frm.set_df_property("client_phone", "read_only", 1);
+                    } else {
+                        frm.set_value("client_phone", "");
+                        frm.set_df_property("client_phone", "read_only", 0);
+                    }
+                    
+
+                },
+            });
+        }
     },
     client_name(frm) {
         if (frm.doc.client_name) {
@@ -116,87 +151,94 @@ frappe.ui.form.on("Project Work Order", {
             frm.set_value("client_email", "")
             frm.set_value("client_phone", "")
         }
-        
+
 
     },
-    before_workflow_action: function (frm) {
-        var action = frm.selected_workflow_action;
+    before_workflow_action: async function (frm) {
+        const action = frm.selected_workflow_action;
+
         if (action && action.toLowerCase() === "submit") {
+            frappe.dom.unfreeze();
             frappe.validated = false;
-            let d = new frappe.ui.Dialog({
-                title: "WorkOrder Confirmation",
-                fields: [
 
-                    {
-                        label: __("Work Order Title"),
-                        fieldname: "work_order_title",
-                        fieldtype: "Data",
-                        default: frm.doc.work_order_title,
-                        read_only: 1,
-                    },
-                    {
-                        label: __("Work Type"),
-                        fieldname: "work_type",
-                        fieldtype: "Data",
-                        default: frm.doc.work_type,
-                        read_only: 1,
-                    },
-                    {
-                        label: __("Total Quantity"),
-                        fieldname: "total_quantity",
-                        fieldtype: "Data",
-                        default: frm.doc.total_quantity,
-                        read_only: 1,
-                    },
-                    {
-                        label: __("Total Amount"),
-                        fieldname: "total_amount",
-                        fieldtype: "Data",
-                        default: frm.doc.total_amount,
-                        read_only: 1,
-                    },
-                ],
-                primary_action_label: "Confirm ",
-                primary_action() {
-                    if (frm.doc.total_amount == 0) {
-                        frm.set_value("workflow_state", "Draft");
-                        frm.save()
-                        d.hide();
-                        frappe.throw("There was no quantity in item");
-                    }
-                    else if (frm.doc.work_items_table) {
-                        frm.doc.work_items_table.forEach((r) => {
-                            if (!r.description) {
-                                frm.set_value("workflow_state", "Draft");
-                                frm.save()
-                                d.hide();
-                                frappe.throw("Add Description in the item")
+            return new Promise((resolve, reject) => {
+                const d = new frappe.ui.Dialog({
+                    title: "WorkOrder Confirmation",
+                    fields: [
+                        {
+                            label: __("Work Order Title"),
+                            fieldname: "work_order_title",
+                            fieldtype: "Data",
+                            default: frm.doc.work_order_title,
+                            read_only: 1,
+                        },
+                        {
+                            label: __("Work Type"),
+                            fieldname: "work_type",
+                            fieldtype: "Data",
+                            default: frm.doc.work_type,
+                            read_only: 1,
+                        },
+                        {
+                            label: __("Total Quantity"),
+                            fieldname: "total_quantity",
+                            fieldtype: "Data",
+                            default: frm.doc.total_quantity,
+                            read_only: 1,
+                        },
+                        {
+                            label: __("Total Amount"),
+                            fieldname: "total_amount",
+                            fieldtype: "Data",
+                            default: frm.doc.total_amount,
+                            read_only: 1,
+                        },
+                    ],
+                    primary_action_label: "Confirm",
+                    primary_action: () => {
+                        if (frm.doc.total_amount == 0) {
+                            d.hide();
+                            frm.set_value("workflow_state", "Draft");
+                            frm.save();
+                            frappe.throw("There was no quantity in item");
+                        }
 
-                            }
-                        })
-                    }
+                        const has_missing_description = frm.doc.work_items_table?.some(r => !r.description);
+                        if (has_missing_description) {
+                            d.hide();
+                            frm.set_value("workflow_state", "Draft");
+                            frm.save();
+                            frappe.throw("Add Description in the item");
+                        }
 
-                    else {
                         frm.set_value("workflow_state", "Submitted");
-                        frm.save()
                         d.hide();
+                        resolve();
+                    },
+                    secondary_action_label: "Back",
+                    secondary_action: () => {
+                        d.hide();
+                        frm.set_value("workflow_state", "Draft");
+                        frm.set_value("status", "Draft");
+                        frm.save();
+                        reject("Action cancelled by user.");
                     }
-                    d.hide();
-                },
-                secondary_action_label: "Back ",
-                secondary_action() {
-                    frm.set_value("workflow_state", "Draft");
-                    frm.set_value("status", "Draft");
-                    frm.save();
+                });
 
-                    d.hide();
-                },
+                d.$wrapper.on("hide.bs.modal", () => {
+                    if (!frm.doc.workflow_state || frm.doc.workflow_state !== "Submitted") {
+                        frm.set_value("workflow_state", "Draft");
+                        frm.set_value("status", "Draft");
+                        frm.save();
+                        reject("Dialog closed by user.");
+                    }
+                });
 
+                d.show();
             });
-            d.show();
-            return false;
         }
     },
+
     start_date(frm) {
         duration(frm);
     },
@@ -279,7 +321,9 @@ frappe.ui.form.on("Work Order Task", {
             frm.set_value("work_items_table", []);
             frm.refresh_fields("work_items_table");
             frm.set_df_property("linked_quotation", "reqd", 1);
-            frappe.throw("Enter the customer and quotation details");
+            frappe.throw("Enter the Linked Quotation and Customer");
+
+
         }
     },
     work_items_table_remove: function (frm, cdn, cdt) {

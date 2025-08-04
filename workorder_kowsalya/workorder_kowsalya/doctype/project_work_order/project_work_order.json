@@ -54,6 +54,7 @@
    "label": "Client Section"
   },
   {
+   "allow_in_quick_entry": 1,
    "fieldname": "client_name",
    "fieldtype": "Link",
    "in_list_view": 1,
@@ -63,18 +64,22 @@
    "reqd": 1
   },
   {
+   "allow_in_quick_entry": 1,
    "fieldname": "client_email",
    "fieldtype": "Data",
    "label": "Client Email",
    "read_only": 1
   },
   {
+   "allow_in_quick_entry": 1,
    "fieldname": "client_phone",
    "fieldtype": "Data",
    "label": "Client Phone",
+   "length": 10,
    "read_only": 1
   },
   {
+   "allow_in_quick_entry": 1,
    "fieldname": "client_address",
    "fieldtype": "Small Text",
    "label": "Client Address",
@@ -215,7 +220,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-08-04 17:42:57.656155",
+ "modified": "2025-08-04 22:46:33.937602",
  "modified_by": "Administrator",
  "module": "Workorder Kowsalya",
  "name": "Project Work Order",
@@ -236,6 +241,7 @@
    "write": 1
   }
  ],
+ "quick_entry": 1,
  "row_format": "Dynamic",
  "sort_field": "modified",
  "sort_order": "DESC",
