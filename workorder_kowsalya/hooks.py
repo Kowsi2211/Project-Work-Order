@@ -242,3 +242,54 @@ app_license = "mit"
 # 	"Logging DocType Name": 30  # days to retain logs
 # }
 
+fixtures = [
+    {"dt":"Workflow","filters": [
+        [ 
+            "name","in", [
+            "Project Work Order Workflow"
+        ]
+        ]
+       
+    ]},
+    {"dt":"Workflow Action Master","filters": [
+        [ 
+            "name","in", [
+            "Edit","Submit"
+        ]
+        ]
+       
+    ]},
+     {"dt":"Workflow State","filters": [
+        [ 
+            "name","in", [
+            "Draft","Reviewed","Submitted"
+        ]
+        ]
+       
+    ]},
+    {"dt":"Report","filters": [
+        [ 
+            "name","in", [
+            "Approved Work Orders"
+        ]
+        ]
+       
+    ]},
+    {"dt":"Role","filters": [
+        [ 
+            "name","in", [
+            "Work Approver","Work Reviewer"
+        ]
+        ]
+       
+    ]},
+    {"dt":"Custom Field","filters": [
+        [ 
+            "name","in", [
+            "Project Work Order-workflow_state"
+        ]
+        ]
+       
+    ]},
+    
+]
