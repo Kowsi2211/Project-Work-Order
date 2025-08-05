@@ -48,3 +48,10 @@ def check_item_value(cust_name,quotation):
 	item = frappe.db.get_value("Quotation",{"customer_name":cust_name,"name":quotation})
 	item_details = frappe.get_doc("Quotation",item)
 	return item_details
+@frappe.whitelist()
+def status(value,name):
+	doc = frappe.get_doc("Project Work Order", name)
+	doc.db_set("status",value)
+	
+	
+	return value,name

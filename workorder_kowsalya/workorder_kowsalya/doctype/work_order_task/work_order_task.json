@@ -35,15 +35,13 @@
    "in_list_view": 1,
    "label": "UOM ",
    "link_filters": "[[\"UOM\",\"name\",\"in\",[\"sq.ft\",\"hrs\",\"pcs\"]]]",
-   "mandatory_depends_on": "item_code",
    "options": "UOM"
   },
   {
    "fieldname": "quantity",
    "fieldtype": "Int",
    "in_list_view": 1,
-   "label": "Quantity",
-   "mandatory_depends_on": "item_code"
+   "label": "Quantity"
   },
   {
    "columns": 2,
@@ -67,7 +65,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-08-04 23:04:40.420838",
+ "modified": "2025-08-05 10:58:34.947793",
  "modified_by": "Administrator",
  "module": "Workorder Kowsalya",
  "name": "Work Order Task",

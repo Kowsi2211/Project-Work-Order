@@ -37,9 +37,12 @@ frappe.ui.form.on("Project Work Order", {
             frm.set_value("client_address", "");
             frm.set_value("client_phone", "");
         }
+        
 
         if (frm.doc.workflow_state === "Submitted") {
             frm.add_custom_button("Change status", () => {
+
+
                 let d = new frappe.ui.Dialog({
                     title: "Status Update",
                     fields: [
@@ -52,10 +55,18 @@ frappe.ui.form.on("Project Work Order", {
                     ],
                     primary_action_label: "Update",
                     primary_action(values) {
-                        frm.set_value("status", values.status);
-                        frm.refresh_fields("status");
-                        frm.save();
-                        frm.remove_custom_button("Change Status")
+                        frappe.call({
+                            method: "workorder_kowsalya.workorder_kowsalya.doctype.project_work_order.project_work_order.status",
+                            args: { value: values.status , name:frm.doc.name},
+                            callback: function (r) {
+                                if(r){
+                                
+                                    frm.reload_doc()
+
+                                }
+                            }
+                        })
+                        
                         d.hide();
 
                     },
@@ -70,9 +81,21 @@ frappe.ui.form.on("Project Work Order", {
             // Hide all buttons or links that say "Edit"
             $("a.dropdown-item:contains('Edit'), button.dropdown-item:contains('Edit')").hide();
         }, 500);
+        if(frm.is_new()){
+                frm.set_query("linked_quotation", () => {
+                return {
+                    filters: {
+                        customer_name: frm.doc.client_name,
+                        docstatus:1,
+                    },
+                }
+            })
+            }
     },
     onload(frm) {
-        if (frm.doc.client_name) {
+        
+        
+        if (frm.doc.client_name && frm.is_new() ) {
 
             frappe.call({
                 method: "workorder_kowsalya.workorder_kowsalya.doctype.project_work_order.project_work_order.fetch_address",
@@ -101,9 +124,16 @@ frappe.ui.form.on("Project Work Order", {
                         frm.set_df_property("client_phone", "read_only", 0);
                     }
                     
+                    
 
                 },
+                
+
             });
+
+            
+            
+            
         }
     },
     client_name(frm) {
@@ -142,6 +172,7 @@ frappe.ui.form.on("Project Work Order", {
                 return {
                     filters: {
                         customer_name: frm.doc.client_name,
+                        docstatus:1,
                     },
                 }
             })
