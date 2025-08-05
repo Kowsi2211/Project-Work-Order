@@ -4,7 +4,7 @@
   "doctype": "Workflow",
   "document_type": "Project Work Order",
   "is_active": 1,
-  "modified": "2025-08-05 09:45:52.744084",
+  "modified": "2025-08-05 10:04:08.827067",
   "name": "Project Work Order Workflow",
   "override_status": 0,
   "send_email_alert": 0,
@@ -28,7 +28,7 @@
    {
     "allow_edit": "Work Reviewer",
     "avoid_status_override": 0,
-    "doc_status": "0",
+    "doc_status": "1",
     "is_optional_state": 0,
     "message": null,
     "next_action_email_template": null,
@@ -44,7 +44,7 @@
    {
     "allow_edit": "Work Approver",
     "avoid_status_override": 0,
-    "doc_status": "0",
+    "doc_status": "1",
     "is_optional_state": 0,
     "message": null,
     "next_action_email_template": null,
